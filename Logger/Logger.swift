@@ -8,6 +8,9 @@
 //  You can also specify a higher precedence level for your message:
 //    Logger.log(.network, .warning, "Timed out waiting for packet!")
 //
+//  If you just want a print indicating where you are in the code, you don't even need to provide a message:
+//    Logger.log(.network)
+//
 //  By default, all channels are printed, using the .initial option set, for all messages flagged .standard or higher.
 //  In addition, even if you limit the channels being printed (see below), messages flagged .warning or .error will
 //  be printed by default, even in channels that you've otherwise silenced.
@@ -146,7 +149,7 @@ class Logger {
     static var overrideLevel: Level = .warning
     static var options: Options = .initial
 
-    static func log(_ messageChannel: Channels, _ messageLevel: Level, _ message: String, _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
+    static func log(_ messageChannel: Channels, _ messageLevel: Level, _ message: String = "", _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
         guard level.rawValue < Level.suppressAll.rawValue else {
             return
         }
@@ -173,9 +176,10 @@ class Logger {
                 }
                 print(formatter.string(from: Date()), terminator: " ")
             }
-            if options.contains(.file) || options.contains(.fileVerbose) {
+            if options.contains(.file) || options.contains(.fileVerbose) || message.isEmpty {
                 var fileString = file
                 if !options.contains(.fileVerbose) {
+                    // just print the file name, not the full path
                     //let pathElements = file.split(separator: "/")  <-- TODO: Swift 4 way...
                     let pathElements = file.components(separatedBy: "/")
                     if let fileName = pathElements.last {
@@ -185,7 +189,7 @@ class Logger {
                 }
                 print("\(fileString):\(line)", terminator: " ")
             }
-            if options.contains(.function) || options.contains(.functionVerbose) {
+            if options.contains(.function) || options.contains(.functionVerbose) || message.isEmpty {
                 var functionString = function
                 if !options.contains(.functionVerbose) {
                     // just print the function name, without the argument names
@@ -220,7 +224,7 @@ class Logger {
         }
     }
 
-    static func log(_ messageChannel: Channels, _ message: String, _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
+    static func log(_ messageChannel: Channels, _ message: String = "", _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
         // if no message level is specified, assume .standard
         log(messageChannel, .standard, message, file, line, function)
     }

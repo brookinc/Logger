@@ -8,6 +8,9 @@
 // log a simple message with the default options
 Logger.log(.ui, "Application loaded.")                          // will print (all channels enabled by default)
 
+// log a bare message that just prints where we are in the code
+Logger.log(.ui)                                                 // will print the file name and line number
+
 // customize our output options and enabled channels
 Logger.options = [.file, .channel]
 Logger.channels = [.ui, .rendering]

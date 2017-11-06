@@ -5,7 +5,7 @@ A lightweight, flexible, channel-based logging tool for Swift.
 Logger offers an easy way to organize your `print()` statements into separate channels, and to control which channels are enabled and disabled:
 
 ```
-Logger.log(.network, "Packet 1 received")  // will print
+Logger.log(.network, "Packet 1 received")  // will print (all channels are enabled by default)
 Logger.channels = [.ui, .rendering]
 Logger.log(.network, "Packet 2 received")  // won't print
 ```
@@ -15,6 +15,12 @@ You can also log errors and warnings; by default they will print even if their c
 ```
 Logger.log(.network, .warning, "Packet 1 is larger than expected.")  // will print
 Logger.log(.network, .error, "Packet 2 is corrupt.")                 // will print
+```
+
+If you just want a print indicating where you are in the code, you don't even need to provide a message:
+
+```
+Logger.log(.ui)  // will print file name + line number
 ```
 
 Logger also lets you print additional information along with each message:
@@ -27,10 +33,12 @@ Logger also lets you print additional information along with each message:
 
 You can customize which information is printed at any time by updating `Logger.options`:
 
-`Logger.options = [.time, .file]`
+`Logger.options = [.time, .file, .threadVerbose]`
 
 ## How to use it
 Just copy `Logger.swift` into your project and start logging. :)
+
+(Additionally, if you use [SwiftLint](https://github.com/realm/SwiftLint), you can copy Logger's SwiftLint rules from the top of `Logger.swift` into your project's `.swiftlint.yml` file.)
 
 ## License
 MIT License
