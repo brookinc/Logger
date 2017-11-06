@@ -125,16 +125,16 @@ class Logger {
     struct Options: OptionSet {
         let rawValue: UInt
 
-        static let time =           Options(rawValue: 1 << 0)
-        static let timeVerbose =    Options(rawValue: 1 << 1)
-        static let file =           Options(rawValue: 1 << 2)
-        static let fileVerbose =    Options(rawValue: 1 << 3)
-        static let function =         Options(rawValue: 1 << 4)
-        static let functionVerbose =  Options(rawValue: 1 << 5)
-        static let thread =           Options(rawValue: 1 << 6)
-        static let threadVerbose =    Options(rawValue: 1 << 7)
-        static let channel =          Options(rawValue: 1 << 8)
-        static let level =            Options(rawValue: 1 << 9)
+        static let channel =          Options(rawValue: 1 << 0)
+        static let level =            Options(rawValue: 1 << 1)
+        static let time =             Options(rawValue: 1 << 2)
+        static let timeVerbose =      Options(rawValue: 1 << 3)
+        static let file =             Options(rawValue: 1 << 4)
+        static let fileVerbose =      Options(rawValue: 1 << 5)
+        static let function =         Options(rawValue: 1 << 6)
+        static let functionVerbose =  Options(rawValue: 1 << 7)
+        static let thread =           Options(rawValue: 1 << 8)
+        static let threadVerbose =    Options(rawValue: 1 << 9)
 
         static let all =            Options(rawValue: UInt.max)
         static let initial: Options = [
