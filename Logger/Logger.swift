@@ -170,9 +170,9 @@ class Logger {
                 let formatter = DateFormatter()
                 formatter.timeZone = TimeZone.current
                 if options.contains(.timeVerbose) {
-                    formatter.dateFormat = "y-MM-dd H:m:ss.SSS"
+                    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
                 } else {
-                    formatter.dateFormat = "H:m:ss"
+                    formatter.dateFormat = "HH:mm:ss"
                 }
                 print(formatter.string(from: Date()), terminator: " ")
             }
