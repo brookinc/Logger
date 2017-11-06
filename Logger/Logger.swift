@@ -78,16 +78,32 @@ custom_rules:
       - identifier
     message: "Use `Logger.log()` instead of `print()`, so that console output can be easily filtered."
     severity: warning
+  logger_error_usage:
+    name: "Logger Error Usage"
+    regex: "Logger\\.log\\W[^\\n\\r\"]+?(?<!\\.error,\\s)\"[^\"]*?[Ee][Rr][Rr][Oo][Rr]"
+    match_kinds:
+      - identifier
+      - string
+    message: "Use the `.error` level when logging errors."
+    severity: warning
+  logger_warning_usage:
+    name: "Logger Warning Usage"
+    regex: "Logger\\.log\\W[^\\n\\r\"]+?(?<!\\.warning,\\s)\"[^\"]*?[Ww][Aa][Rr][Nn][Ii][Nn][Gg]"
+    match_kinds:
+      - identifier
+      - string
+    message: "Use the `.warning` level when logging warnings."
+    severity: warning
   logger_temp:
     name: "Logger Temporary Channel"
-    regex: "\\.log\\W[^\\n\\r]*?(Logger\\.Channels)?\\.temp\\W"
+    regex: "Logger\\.log\\W[^\\n\\r]*?(Logger\\.Channels)?\\.temp\\W"
     match_kinds:
       - identifier
     message: "The `.temp` print channel is only for temporary print statements."
     severity: warning
   logger_suppress_all:
     name: "Logger Suppress-All Level"
-    regex: "\\.log\\W[^\\n\\r]+?(Logger\\.Level)?\\.suppressAll\\W"
+    regex: "Logger\\.log\\W[^\\n\\r]+?(Logger\\.Level)?\\.suppressAll\\W"
     match_kinds:
       - identifier
     message: "Logging a message with level `.suppressAll` means that message will never be seen."
