@@ -164,10 +164,14 @@ class Logger {
                 print("Error:", terminator: " ")
             }
             if options.contains(.time) || options.contains(.timeVerbose) {
-                if !options.contains(.timeVerbose) {
-                    // TODO: if .timeVerbose isn't set, we should only print the time
+                let formatter = DateFormatter()
+                formatter.timeZone = TimeZone.current
+                if options.contains(.timeVerbose) {
+                    formatter.dateFormat = "y-MM-dd H:m:ss.SSS"
+                } else {
+                    formatter.dateFormat = "H:m:ss"
                 }
-                print(Date().description, terminator: " ")
+                print(formatter.string(from: Date()), terminator: " ")
             }
             if options.contains(.file) || options.contains(.fileVerbose) {
                 var fileString = file
