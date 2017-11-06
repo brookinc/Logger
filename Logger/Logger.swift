@@ -1,3 +1,6 @@
+// (Disable various SwiftLint rules from triggering in this file)
+// swiftlint:disable line_length
+// swiftlint:disable logger_enforce function_parameter_count function_body_length cyclomatic_complexity operator_usage_whitespace trailing_whitespace
 //
 //  Logger.swift
 //  https://github.com/brookinc/logger
@@ -140,10 +143,6 @@ custom_rules:
     severity: warning
 */
 
-// (These comment lines are then needed to prevent SwiftLint from triggering in this file:)
-// swiftlint:disable logger_enforce
-// swiftlint:disable function_parameter_count
-
 import Foundation
 
 class Logger {
@@ -242,11 +241,32 @@ class Logger {
                 // print the current thread info -- it's not exposed directly, but we can parse it from the description
                 // (technically, `Thread.name` is available, but in practice it appears to always be empty.)
                 let str = Thread.current.description  // Sample description: "<NSThread: 0x1c007ebc0>{number = 1, name = main}"
-                let threadNumber = str.substring(with: str.range(of: "number = ")?.upperBound ..< str.range(of: ",")?.lowerBound)
+                #if swift(>=4.0)
+                    var threadNumber: Substring = ""
+                    if let start = str.range(of: "number = ")?.upperBound,
+                        let end = str.range(of: ",")?.lowerBound {
+                        threadNumber = str[start ..< end]
+                    }
+                #else
+                    let threadNumber = str.substring(with: str.range(of: "number = ")?.upperBound ..< str.range(of: ",")?.lowerBound)
+                #endif
                 var threadString = "[t\(threadNumber)]"
                 if options.contains(.threadVerbose) {
-                    let threadAddress = str.substring(with: str.range(of: "0")?.lowerBound ..< str.range(of: ">")?.lowerBound)
-                    let threadName = str.substring(with: str.range(of: "name = ")?.upperBound ..< str.range(of: "}")?.lowerBound)
+                    #if swift(>=4.0)
+                        var threadAddress: Substring = ""
+                        if let start = str.range(of: "0")?.lowerBound,
+                            let end = str.range(of: ">")?.lowerBound {
+                            threadAddress = str[start ..< end]
+                        }
+                        var threadName: Substring = ""
+                        if let start = str.range(of: "name = ")?.upperBound,
+                            let end = str.range(of: "}")?.lowerBound {
+                            threadName = str[start ..< end]
+                        }
+                    #else
+                        let threadAddress = str.substring(with: str.range(of: "0")?.lowerBound ..< str.range(of: ">")?.lowerBound)
+                        let threadName = str.substring(with: str.range(of: "name = ")?.upperBound ..< str.range(of: "}")?.lowerBound)
+                    #endif
                     let threadNameString = (threadName == "(null)") ? "" : " (\(threadName))"
                     threadString = "[\(threadNumber):\(threadAddress)\(threadNameString)]"
                 }
@@ -259,11 +279,17 @@ class Logger {
                 var fileString = file.description
                 if !options.contains(.fileVerbose) {
                     // just print the file name, not the full path
-                    //let pathElements = file.split(separator: "/")  <-- TODO: Swift 4 way...
-                    let pathElements = file.description.components(separatedBy: "/")
+                    #if swift(>=4.0)
+                        let pathElements = file.description.split(separator: "/")
+                    #else
+                        let pathElements = file.description.components(separatedBy: "/")
+                    #endif
                     if let fileName = pathElements.last {
-                        //fileString = String(fileName)  <-- TODO: Swift 4 way...
-                        fileString = fileName
+                        #if swift(>=4.0)
+                            fileString = String(fileName)
+                        #else
+                            fileString = fileName
+                        #endif
                     }
                 }
                 print("\(fileString):\(line)", terminator: " ")
@@ -273,7 +299,11 @@ class Logger {
                 if !options.contains(.functionVerbose) {
                     // just print the function name, without the argument names
                     if let parenthesesIndex = function.range(of: "(")?.lowerBound {
-                        functionString = function.substring(with: function.startIndex ..< parenthesesIndex) + "()"
+                        #if swift(>=4.0)
+                            functionString = function[..<parenthesesIndex] + "()"
+                        #else
+                            functionString = function.substring(with: function.startIndex ..< parenthesesIndex) + "()"
+                        #endif
                     }
                 }
                 print("\(functionString)", terminator: " ")
