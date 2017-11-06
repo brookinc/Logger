@@ -30,6 +30,7 @@ Logger also lets you print additional information along with each message:
 - `.file` / `.fileVerbose`: the file name and line number from which the message was logged
 - `.function` / `.functionVerbose`: the function from which the message was logged
 - `.thread` / `.threadVerbose`: the thread from which the message was logged
+- `.assertOnError`: this option will trigger an assert failure whenever an error is logged
 
 You can customize which information is printed at any time by updating `Logger.options`:
 

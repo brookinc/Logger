@@ -151,6 +151,7 @@ class Logger {
         static let functionVerbose =  Options(rawValue: 1 << 7)
         static let thread =           Options(rawValue: 1 << 8)
         static let threadVerbose =    Options(rawValue: 1 << 9)
+        static let assertOnError =    Options(rawValue: 1 << 10)
 
         static let all =              Options(rawValue: UInt.max)
         static let initial: Options = [
@@ -165,7 +166,7 @@ class Logger {
     static var overrideLevel: Level = .warning
     static var options: Options = .initial
 
-    static func log(_ messageChannel: Channels, _ messageLevel: Level, _ message: String = "", _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
+    static func log(_ messageChannel: Channels, _ messageLevel: Level, _ message: String = "", _ file: StaticString = #file, _ line: UInt = #line, _ function: String = #function) {
         guard level.rawValue < Level.suppressAll.rawValue else {
             return
         }
@@ -202,11 +203,11 @@ class Logger {
                 print(messageLevel, terminator: " ")
             }
             if options.contains(.file) || options.contains(.fileVerbose) || message.isEmpty {
-                var fileString = file
+                var fileString = file.description
                 if !options.contains(.fileVerbose) {
                     // just print the file name, not the full path
                     //let pathElements = file.split(separator: "/")  <-- TODO: Swift 4 way...
-                    let pathElements = file.components(separatedBy: "/")
+                    let pathElements = file.description.components(separatedBy: "/")
                     if let fileName = pathElements.last {
                         //fileString = String(fileName)  <-- TODO: Swift 4 way...
                         fileString = fileName
@@ -239,10 +240,14 @@ class Logger {
                 print(threadString, terminator: " ")
             }
             print(message)
+
+            if options.contains(.assertOnError) && messageLevel == .error {
+                assertionFailure(message, file: file, line: line)
+            }
         }
     }
 
-    static func log(_ messageChannel: Channels, _ message: String = "", _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
+    static func log(_ messageChannel: Channels, _ message: String = "", _ file: StaticString = #file, _ line: UInt = #line, _ function: String = #function) {
         // if no message level is specified, assume .standard
         log(messageChannel, .standard, message, file, line, function)
     }
