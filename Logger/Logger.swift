@@ -52,14 +52,16 @@
 //        // ...or, to completely silence suppressed channels (ie. don't even print warnings or errors from those channels):
 //        Logger.overrideLevel = .suppressAll
 //
-//        // print the time, file location, and current thread for each logged message
-//        Logger.options = [.time, .file, .thread]
+//        // print the time, file location, channel, and current thread for each logged message:
+//        Logger.options = [.time, .file, .channel, .thread]
+//        // ...or just print each message with no additional info:
+//        Logger.options = []
 //
 //  If you want to completely suppress all messages from all channels, you can set the current level to .suppressAll:
 //    Logger.level = .suppressAll
 //
-//  You can create your own delegate if you want to do additional processing or tracking of Logger messages. Simply create
-//  a class which implements the LoggerDelegate protocol:
+//  You can create your own delegate if you want to do additional processing or tracking of Logger messages. Simply
+//  create a class which implements the LoggerDelegate protocol:
 //    class MyLogger: LoggerDelegate {
 //        func log(_ messageChannel: Logger.Channels, _ messageLevel: Logger.Level, _ message: String, _ file: StaticString, _ line: UInt, _ function: String) {
 //            if messageLevel == .error {
@@ -75,7 +77,7 @@
 //  Your delegate object will receive all messages logged to all channels at all levels; the .channels and .level
 //  filters are not applied to delegates.
 //
-//  Addtional channels can be added as needed in the Channels option set below.
+//  Additional channels can be added as needed in the Channels option set below.
 //
 //  LICENSE:
 //  MIT License
@@ -155,7 +157,7 @@ class Logger {
         static let rendering =  Channels(rawValue: 1 << 2)
         static let ui =         Channels(rawValue: 1 << 3)
 
-        static let temp =       Channels(rawValue: 1 << 63)  // Intended for local use only (and thus triggers a SwiftLint warning)
+        static let temp =       Channels(rawValue: 1 << 63)  // Intended for local use only (and thus will trigger a SwiftLint warning)
 
         static let all =        Channels(rawValue: UInt.max)
     }
@@ -317,6 +319,13 @@ class Logger {
         log(messageChannel, .standard, message, file, line, function)
     }
 
+    // print the current callstack (albeit with somewhat garbled symbols)
+    static func logCallStack() {
+        Thread.callStackSymbols.forEach {
+            print($0)
+        }
+    }
+    
     // experimental / undocumented way to read the executable's filename and path
     // (see https://lists.swift.org/pipermail/swift-users/Week-of-Mon-20161128/004143.html)
     static func appName(_ dsoHandle: UnsafeRawPointer = #dsohandle) -> String {
