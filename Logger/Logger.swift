@@ -126,16 +126,17 @@ class Logger {
         static let timeVerbose =    Options(rawValue: 1 << 1)
         static let file =           Options(rawValue: 1 << 2)
         static let fileVerbose =    Options(rawValue: 1 << 3)
-        static let thread =         Options(rawValue: 1 << 4)
-        static let threadVerbose =  Options(rawValue: 1 << 5)
-        static let channel =        Options(rawValue: 1 << 6)
-        static let level =          Options(rawValue: 1 << 7)
+        static let function =         Options(rawValue: 1 << 4)
+        static let functionVerbose =  Options(rawValue: 1 << 5)
+        static let thread =           Options(rawValue: 1 << 6)
+        static let threadVerbose =    Options(rawValue: 1 << 7)
+        static let channel =          Options(rawValue: 1 << 8)
+        static let level =            Options(rawValue: 1 << 9)
 
         static let all =            Options(rawValue: UInt.max)
         static let initial: Options = [
             .time,
-            .file,
-            .level
+            .file
         ]
     }
 
@@ -145,7 +146,7 @@ class Logger {
     static var overrideLevel: Level = .warning
     static var options: Options = .initial
 
-    static func log(_ messageChannel: Channels, _ messageLevel: Level, _ message: String, _ file: String = #file, _ line: Int = #line) {
+    static func log(_ messageChannel: Channels, _ messageLevel: Level, _ message: String, _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
         guard level.rawValue < Level.suppressAll.rawValue else {
             return
         }
@@ -180,6 +181,16 @@ class Logger {
                 }
                 print("\(fileString):\(line)", terminator: " ")
             }
+            if options.contains(.function) || options.contains(.functionVerbose) {
+                var functionString = function
+                if !options.contains(.functionVerbose) {
+                    // just print the function name, without the argument names
+                    if let parenthesesIndex = function.range(of: "(")?.lowerBound {
+                        functionString = function.substring(with: function.startIndex ..< parenthesesIndex) + "()"
+                    }
+                }
+                print("\(functionString)", terminator: " ")
+            }
             if options.contains(.thread) || options.contains(.threadVerbose) {
                 // print the current thread info -- it's not exposed directly, but we can parse it from the description
                 // (technically, `Thread.name` is available, but in practice it appears to always be empty.)
@@ -205,8 +216,8 @@ class Logger {
         }
     }
 
-    static func log(_ messageChannel: Channels, _ message: String, _ file: String = #file, _ line: Int = #line) {
+    static func log(_ messageChannel: Channels, _ message: String, _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
         // if no message level is specified, assume .standard
-        log(messageChannel, .standard, message, file, line)
+        log(messageChannel, .standard, message, file, line, function)
     }
 }
