@@ -193,8 +193,10 @@ class Logger {
                 print(formatter.string(from: Date()), terminator: " ")
             }
             if options.contains(.channel) {
-                // TODO: print(.network) yields "Channels(rawValue: 1)" -- can we cleanly and easily make it print the name instead?
-                print("[\(messageChannel)]", terminator: " ")
+                // print the log2() of the raw value, so it more clearly matches the channel assignment value
+                print("[ch\(Int(log2(Double(messageChannel.rawValue))))]", terminator: " ")
+                // TODO: is there a way to actually print the channel name as a string, without having
+                // to manually maintain a separate array of strings?
             }
             if options.contains(.level) {
                 print(messageLevel, terminator: " ")
