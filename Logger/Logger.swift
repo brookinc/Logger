@@ -126,8 +126,10 @@ class Logger {
         static let timeVerbose =    Options(rawValue: 1 << 1)
         static let file =           Options(rawValue: 1 << 2)
         static let fileVerbose =    Options(rawValue: 1 << 3)
-        static let channel =        Options(rawValue: 1 << 4)
-        static let level =          Options(rawValue: 1 << 5)
+        static let thread =         Options(rawValue: 1 << 4)
+        static let threadVerbose =  Options(rawValue: 1 << 5)
+        static let channel =        Options(rawValue: 1 << 6)
+        static let level =          Options(rawValue: 1 << 7)
 
         static let all =            Options(rawValue: UInt.max)
         static let initial: Options = [
@@ -177,6 +179,20 @@ class Logger {
                     }
                 }
                 print("\(fileString):\(line)", terminator: " ")
+            }
+            if options.contains(.thread) || options.contains(.threadVerbose) {
+                // print the current thread info -- it's not exposed directly, but we can parse it from the description
+                // (technically, `Thread.name` is available, but in practice it appears to always be empty.)
+                let str = Thread.current.description  // Sample description: "<NSThread: 0x1c007ebc0>{number = 1, name = main}"
+                let threadNumber = str.substring(with: str.range(of: "number = ")?.upperBound ..< str.range(of: ",")?.lowerBound)
+                var threadString = "[\(threadNumber)]"
+                if options.contains(.threadVerbose) {
+                    let threadAddress = str.substring(with: str.range(of: "0")?.lowerBound ..< str.range(of: ">")?.lowerBound)
+                    let threadName = str.substring(with: str.range(of: "name = ")?.upperBound ..< str.range(of: "}")?.lowerBound)
+                    let threadNameString = (threadName == "(null)") ? "" : " (\(threadName))"
+                    threadString = "[\(threadNumber):\(threadAddress)\(threadNameString)]"
+                }
+                print(threadString, terminator: " ")
             }
             if options.contains(.channel) {
                 // TODO: print(.network) yields "Channels(rawValue: 1)" -- can we cleanly and easily make it print the name instead?

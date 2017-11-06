@@ -18,10 +18,11 @@ Logger.log(.network, .error, "Packet 2 is corrupt.")                 // will pri
 ```
 
 Logger also lets you print additional information along with each message:
-- `.time` / `.timeVerbose`: the date / time the message was logged
-- `.file` / `.fileVerbose`: the file name and line number from which the message was logged
 - `.channel`: the channel to which the message was logged
 - `.level`: the level at which the message was logged (`verbose`, `standard`, `warning`, `error`)
+- `.time` / `.timeVerbose`: the date / time the message was logged
+- `.file` / `.fileVerbose`: the file name and line number from which the message was logged
+- `.thread` / `.threadVerbose`: the thread from which the message was logged
 
 You can customize which information is printed at any time by updating `Logger.options`:
 
