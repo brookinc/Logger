@@ -63,6 +63,8 @@ class Logger {
         static let rendering =  Channels(rawValue: 1 << 2)
         static let ui =         Channels(rawValue: 1 << 3)
 
+        static let temp =       Channels(rawValue: 1 << 63)  // Intended for local use only (and thus triggers a SwiftLint warning).
+
         static let all =        Channels(rawValue: UInt.max)
     }
 
