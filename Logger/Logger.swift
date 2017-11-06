@@ -152,7 +152,7 @@ class Logger {
         static let thread =           Options(rawValue: 1 << 8)
         static let threadVerbose =    Options(rawValue: 1 << 9)
 
-        static let all =            Options(rawValue: UInt.max)
+        static let all =              Options(rawValue: UInt.max)
         static let initial: Options = [
             .time,
             .file
@@ -243,5 +243,19 @@ class Logger {
     static func log(_ messageChannel: Channels, _ message: String = "", _ file: String = #file, _ line: Int = #line, _ function: String = #function) {
         // if no message level is specified, assume .standard
         log(messageChannel, .standard, message, file, line, function)
+    }
+
+    // experimental / undocumented way to read the executable's filename and path
+    // (see https://lists.swift.org/pipermail/swift-users/Week-of-Mon-20161128/004143.html)
+    static func appName(_ dsoHandle: UnsafeRawPointer = #dsohandle) -> String {
+        var dlInformation: dl_info = dl_info()
+        dladdr(dsoHandle, &dlInformation)
+        let path = String(cString: dlInformation.dli_fname)
+        var appString = path
+        let pathElements = path.components(separatedBy: "/")
+        if pathElements.count > 2 {
+            appString = pathElements[pathElements.count - 2]
+        }
+        return appString
     }
 }
