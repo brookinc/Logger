@@ -176,6 +176,13 @@ class Logger {
                 }
                 print(formatter.string(from: Date()), terminator: " ")
             }
+            if options.contains(.channel) {
+                // TODO: print(.network) yields "Channels(rawValue: 1)" -- can we cleanly and easily make it print the name instead?
+                print("[\(messageChannel)]", terminator: " ")
+            }
+            if options.contains(.level) {
+                print(messageLevel, terminator: " ")
+            }
             if options.contains(.file) || options.contains(.fileVerbose) || message.isEmpty {
                 var fileString = file
                 if !options.contains(.fileVerbose) {
@@ -212,13 +219,6 @@ class Logger {
                     threadString = "[\(threadNumber):\(threadAddress)\(threadNameString)]"
                 }
                 print(threadString, terminator: " ")
-            }
-            if options.contains(.channel) {
-                // TODO: print(.network) yields "Channels(rawValue: 1)" -- can we cleanly and easily make it print the name instead?
-                print("[\(messageChannel)]", terminator: " ")
-            }
-            if options.contains(.level) {
-                print(messageLevel, terminator: " ")
             }
             print(message)
         }
