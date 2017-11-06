@@ -5,25 +5,38 @@
 //  To log a standard message to a channel, simply call Logger.log():
 //    Logger.log(.network, "Packet received successfully.")
 //
-//  You can also specify a higher filter level for your message:
+//  You can also specify a higher precedence level for your message:
 //    Logger.log(.network, .warning, "Timed out waiting for packet!")
 //
-//  By default, all channels are printed, with the .initial option set, for all messages flagged .standard or higher.
-//  To customize this, you can do something like this:
-//    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-//        // print only the channels I care about
-//        Logger.channels = [.network, .rendering]
-//        // print all messages flagged .verbose or higher in those channels
-//        Logger.level = .verbose
-//        // also make sure to print errors from any channel
-//        Logger.overrideLevel = .error
-//        // print the time and file location for each message
-//        Logger.options = [.timestamp, .filename]
+//  By default, all channels are printed, using the .initial option set, for all messages flagged .standard or higher.
+//  In addition, even if you limit the channels being printed (see below), messages flagged .warning or .error will
+//  be printed by default, even in channels that you've otherwise silenced.
 //
-//  To turn off all override prints (ie. warnings / errors from other channels), set the override level to .suppressAll:
+//  To customize the prints you see, you simply change the relevant Logger properties:
+//    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+//        ...
+//        // print only the messages sent to one channel:
+//        Logger.channels = .network
+//        // ...or to a few channels:
+//        Logger.channels = [.network, .rendering]
+//        // ...or to all channels but one:
+//        Logger.channels = Logger.Channels.all.subtracting(.network)
+//        // ...or to all channels but a few:
+//        Logger.channels = Logger.Channels.all.subtracting([.network, .rendering])
+//
+//        // print all messages flagged .verbose or higher in the chosen channels
+//        Logger.level = .verbose
+//
+//        // also print error messages from any channel, even ones you haven't chosen
+//        Logger.overrideLevel = .error
+//
+//        // print the time and file location when printing each message
+//        Logger.options = [.time, .file]
+//
+//  If you want to suppress all override prints (ie. warnings / errors from other channels), set the override level to .suppressAll:
 //    Logger.overrideLevel = .suppressAll
 //
-//  ...or to disable all prints, set the current level to .suppressAll:
+//  ...or, to suppress all prints altogether, set the current level to .suppressAll:
 //    Logger.currentLevel = .suppressAll
 //
 //  Addtional channels can be added in the Channels option set below as needed.
@@ -51,6 +64,36 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+/*
+# SwiftLint Support
+# If you use SwiftLint (http://github.com/realm/SwiftLint), you may wish to add these rules to your .swiftlint.yml file:
+custom_rules:
+  logger_enforce:
+    name: "Logger Enforcement"
+    regex: "[^.](?<!func )print\\s*?\\("
+    match_kinds:
+      - identifier
+    message: "Use `Logger.log()` instead of `print()`, so that console output can be easily filtered."
+    severity: warning
+  logger_temp:
+    name: "Logger Temporary Channel"
+    regex: "\\.log\\W[^\\n\\r]*?(Logger\\.Channels)?\\.temp\\W"
+    match_kinds:
+      - identifier
+    message: "The `.temp` print channel is only for temporary print statements."
+    severity: warning
+  logger_suppress_all:
+    name: "Logger Suppress-All Level"
+    regex: "\\.log\\W[^\\n\\r]+?(Logger\\.Level)?\\.suppressAll\\W"
+    match_kinds:
+      - identifier
+    message: "Logging a message with level `.suppressAll` means that message will never be seen."
+    severity: warning
+*/
+
+// If you do enable the above rules, the next line is needed to prevent them from triggering in this file.
+// swiftlint:disable logger_enforce
+
 import Foundation
 
 class Logger {
@@ -63,7 +106,7 @@ class Logger {
         static let rendering =  Channels(rawValue: 1 << 2)
         static let ui =         Channels(rawValue: 1 << 3)
 
-        static let temp =       Channels(rawValue: 1 << 63)  // Intended for local use only (and thus triggers a SwiftLint warning).
+        static let temp =       Channels(rawValue: 1 << 63)  // Intended for local use only (and thus triggers a SwiftLint warning)
 
         static let all =        Channels(rawValue: UInt.max)
     }
@@ -79,17 +122,17 @@ class Logger {
     struct Options: OptionSet {
         let rawValue: UInt
 
-        static let dateTime  = Options(rawValue: 1 << 0)
-        static let timestamp = Options(rawValue: 1 << 1)
-        static let fullPath =  Options(rawValue: 1 << 2)
-        static let filename =  Options(rawValue: 1 << 3)
-        static let channel =   Options(rawValue: 1 << 4)
-        static let level =     Options(rawValue: 1 << 5)
+        static let time =           Options(rawValue: 1 << 0)
+        static let timeVerbose =    Options(rawValue: 1 << 1)
+        static let file =           Options(rawValue: 1 << 2)
+        static let fileVerbose =    Options(rawValue: 1 << 3)
+        static let channel =        Options(rawValue: 1 << 4)
+        static let level =          Options(rawValue: 1 << 5)
 
-        static let all =       Options(rawValue: UInt.max)
+        static let all =            Options(rawValue: UInt.max)
         static let initial: Options = [
-            .timestamp,
-            .filename,
+            .time,
+            .file,
             .level
         ]
     }
@@ -117,15 +160,15 @@ class Logger {
             } else if messageLevel == .error {
                 print("Error:", terminator: " ")
             }
-            if options.contains(.dateTime) || options.contains(.timestamp) {
-                if !options.contains(.dateTime) {
-                    // TODO: if .dateTime isn't set, we should only print the time
+            if options.contains(.time) || options.contains(.timeVerbose) {
+                if !options.contains(.timeVerbose) {
+                    // TODO: if .timeVerbose isn't set, we should only print the time
                 }
                 print(Date().description, terminator: " ")
             }
-            if options.contains(.fullPath) || options.contains(.filename) {
+            if options.contains(.file) || options.contains(.fileVerbose) {
                 var fileString = file
-                if !options.contains(.fullPath) {
+                if !options.contains(.fileVerbose) {
                     //let pathElements = file.split(separator: "/")  <-- TODO: Swift 4 way...
                     let pathElements = file.components(separatedBy: "/")
                     if let fileName = pathElements.last {

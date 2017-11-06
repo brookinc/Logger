@@ -18,16 +18,14 @@ Logger.log(.network, .error, "Packet 2 is corrupt.")                 // will pri
 ```
 
 Logger also lets you print additional information along with each message:
-- `.dateTime`: the date and time the message was logged
-- `.timestamp`: the time the message was logged
-- `.fullPath`: the full path of the file from which the message was logged
-- `.filename`: the file name and line number from which the message was logged
+- `.time` / `.timeVerbose`: the date / time the message was logged
+- `.file` / `.fileVerbose`: the file name and line number from which the message was logged
 - `.channel`: the channel to which the message was logged
 - `.level`: the level at which the message was logged (`verbose`, `standard`, `warning`, `error`)
 
 You can customize which information is printed at any time by updating `Logger.options`:
 
-`Logger.options = [.timestamp, .filename]`
+`Logger.options = [.time, .file]`
 
 ## How to use it
 Just copy `Logger.swift` into your project and start logging. :)

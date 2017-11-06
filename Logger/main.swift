@@ -9,7 +9,7 @@
 Logger.log(.ui, "Application loaded.")                          // will print (all channels enabled by default)
 
 // customize our output options and enabled channels
-Logger.options = [.filename, .channel]
+Logger.options = [.file, .channel]
 Logger.channels = [.ui, .rendering]
 
 // log some more standard messages to various channels
