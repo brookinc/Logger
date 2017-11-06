@@ -109,19 +109,19 @@ class Logger {
         }
 
         if (channels.contains(messageChannel) && level.rawValue <= messageLevel.rawValue)
-            || (overrideLevel.rawValue <= messageLevel.rawValue) {
-            if (messageLevel == .warning) {
+            || overrideLevel.rawValue <= messageLevel.rawValue {
+            if messageLevel == .warning {
                 print("Warning:", terminator: " ")
-            } else if (messageLevel == .error) {
+            } else if messageLevel == .error {
                 print("Error:", terminator: " ")
             }
-            if (options.contains(.dateTime) || options.contains(.timestamp) ) {
+            if options.contains(.dateTime) || options.contains(.timestamp) {
                 if !options.contains(.dateTime) {
                     // TODO: if .dateTime isn't set, we should only print the time
                 }
                 print(Date().description, terminator: " ")
             }
-            if (options.contains(.fullPath) || options.contains(.filename) ) {
+            if options.contains(.fullPath) || options.contains(.filename) {
                 var fileString = file
                 if !options.contains(.fullPath) {
                     //let pathElements = file.split(separator: "/")  <-- TODO: Swift 4 way...
@@ -133,11 +133,11 @@ class Logger {
                 }
                 print("\(fileString):\(line)", terminator: " ")
             }
-            if (options.contains(.channel)) {
+            if options.contains(.channel) {
                 // TODO: print(.network) yields "Channels(rawValue: 1)" -- can we cleanly and easily make it print the name instead?
                 print("[\(messageChannel)]", terminator: " ")
             }
-            if (options.contains(.level)) {
+            if options.contains(.level) {
                 print(messageLevel, terminator: " ")
             }
             print(message)
