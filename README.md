@@ -4,7 +4,7 @@ A lightweight, flexible, channel-based logging tool for Swift.
 ## What it does
 Logger offers an easy way to organize your `print()` statements into separate channels, and to control which channels are enabled and disabled:
 
-```
+```swift
 Logger.log(.network, "Packet 1 received")  // will print (all channels are enabled by default)
 Logger.channels = [.ui, .rendering]
 Logger.log(.network, "Packet 2 received")  // won't print
@@ -12,14 +12,14 @@ Logger.log(.network, "Packet 2 received")  // won't print
 
 You can also log errors and warnings; by default they will print even if their channel is disabled:
 
-```
+```swift
 Logger.log(.network, .warning, "Packet 1 is larger than expected.")  // will print
 Logger.log(.network, .error, "Packet 2 is corrupt.")                 // will print
 ```
 
 If you just want a print indicating where you are in the code, you don't even need to provide a message:
 
-```
+```swift
 Logger.log(.ui)  // will print file name + line number
 ```
 
@@ -33,11 +33,13 @@ Logger also lets you print additional information along with each message:
 
 You can customize which information is printed at any time by updating `Logger.options`:
 
-`Logger.options = [.time, .file, .threadVerbose]`
-
-If you want to do any custom handling of Logger messages, you can create a delegate:
-
+```swift
+Logger.options = [.time, .file, .threadVerbose]
 ```
+
+Additionally, if you want to do any custom handling or recording of Logger messages, you can create a delegate:
+
+```swift
 class MyLogger: LoggerDelegate {
     func log(_ messageChannel: Logger.Channels, _ messageLevel: Logger.Level, _ message: String, _ file: StaticString, _ line: UInt, _ function: String) {
         if messageLevel == .error {
@@ -50,7 +52,7 @@ class MyLogger: LoggerDelegate {
 
 ...and register it:
 
-```
+```swift
 let myLogger = MyLogger()
 Logger.delegates.append(myLogger)
 ```
