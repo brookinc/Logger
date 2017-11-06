@@ -14,7 +14,7 @@
 //    Logger.log(.network, .verbose, "Waiting for packet...")
 //
 //  If you just want a print that indicates where you are in the code, you don't even need to provide a message:
-//    Logger.log(.network)
+//    Logger.log(.temp)
 //
 //  You can enable any or all of the following output options:
 //    .channel:                    prints the channel to which the message was logged
@@ -234,13 +234,12 @@ class Logger {
                 print(formatter.string(from: Date()), terminator: " ")
             }
             if options.contains(.channel) {
+                // don't add a trailing space if we're going to print the thread next
+                let terminator = (options.contains(.thread) || options.contains(.threadVerbose)) ? "" : " "
                 // print the log2() of the raw value, so it more clearly matches the channel assignment value
-                print("[ch\(Int(log2(Double(messageChannel.rawValue))))]", terminator: " ")
+                print("[ch\(Int(log2(Double(messageChannel.rawValue))))]", terminator: terminator)
                 // TODO: is there a way to actually print the channel name as a string, without having
                 // to manually maintain a separate array of strings?
-            }
-            if options.contains(.level) {
-                print(messageLevel, terminator: " ")
             }
             if options.contains(.thread) || options.contains(.threadVerbose) {
                 // print the current thread info -- it's not exposed directly, but we can parse it from the description
@@ -255,6 +254,9 @@ class Logger {
                     threadString = "[\(threadNumber):\(threadAddress)\(threadNameString)]"
                 }
                 print(threadString, terminator: " ")
+            }
+            if options.contains(.level) {
+                print(messageLevel, terminator: " ")
             }
             if options.contains(.file) || options.contains(.fileVerbose) || message.isEmpty {
                 var fileString = file.description
