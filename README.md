@@ -36,6 +36,27 @@ You can customize which information is printed at any time by updating `Logger.o
 
 `Logger.options = [.time, .file, .threadVerbose]`
 
+If you want to do any custom handling of Logger messages, you can create a delegate:
+
+```
+class MyLogger: LoggerDelegate {
+    func log(_ messageChannel: Logger.Channels, _ messageLevel: Logger.Level, _ message: String, _ file: StaticString, _ line: UInt, _ function: String) {
+        if messageLevel == .error {
+            MyErrorDatabase.addRow(file: file, line: line, message: message)
+        }
+    }
+}
+```
+
+...and register it:
+
+```
+let myLogger = MyLogger()
+Logger.delegates.append(myLogger)
+```
+
+Your delegate object will receive all messages that get logged; the .channel and .level filters are not applied to delegates.
+
 ## How to use it
 Just copy `Logger.swift` into your project and start logging. :)
 

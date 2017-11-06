@@ -2,20 +2,36 @@
 //  Logger.swift
 //  https://github.com/brookinc/logger
 //
+//  Logger is a structured, flexible replacement for Swift's built-in print() function. With it, you can filter
+//  your print statements into different channels, assign them different priorities, and easily control at
+//  run-time which statements get printed, and what extra information accompanies them.
+//
 //  To log a standard message to a channel, simply call Logger.log():
 //    Logger.log(.network, "Packet received successfully.")
 //
-//  You can also specify a higher precedence level for your message:
+//  You can also specify a higher (or lower) priority level for your message:
 //    Logger.log(.network, .warning, "Timed out waiting for packet!")
+//    Logger.log(.network, .verbose, "Waiting for packet...")
 //
-//  If you just want a print indicating where you are in the code, you don't even need to provide a message:
+//  If you just want a print that indicates where you are in the code, you don't even need to provide a message:
 //    Logger.log(.network)
 //
-//  By default, all channels are printed, using the .initial option set, for all messages flagged .standard or higher.
-//  In addition, even if you limit the channels being printed (see below), messages flagged .warning or .error will
-//  be printed by default, even in channels that you've otherwise silenced.
+//  You can enable any or all of the following output options:
+//    .channel:                    prints the channel to which the message was logged
+//    .level:                      prints the priority level at which the message was logged (verbose, standard, warning, or error)
+//    .time/.timeVerbose           prints the timestamp at which the message was logged
+//    .file/.fileVerbose:          prints file and line number from which the message was logged
+//    .function/.functionVerbose:  prints the name of the function from which the message was logged
+//    .thread/.threadVerbose:      prints the thread from which the message was logged
 //
-//  To customize the prints you see, you simply change the relevant Logger properties:
+//  You can also enable the .assertOnError option, which will trigger an assert any time an (unsuppressed)
+//  error message is logged.
+//
+//  By default, all channels are printed (using the .initial option set), for all messages flagged .standard or higher.
+//  In addition, even if you limit the channels being printed (see below), messages flagged .warning or .error will
+//  (by default) still be printed for all channels.
+//
+//  To customize which prints you see, and how they're printed, you simply change the relevant Logger properties:
 //    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 //        ...
 //        // print only the messages sent to one channel:
@@ -30,19 +46,35 @@
 //        // print all messages flagged .verbose or higher in the chosen channels
 //        Logger.level = .verbose
 //
-//        // also print error messages from any channel, even ones you haven't chosen
+//        // from suppressed channels, only print error messages (the default override level is .warning,
+//        // which prints both warnings and errors)
 //        Logger.overrideLevel = .error
+//        // ...or, to completely silence suppressed channels (ie. don't even print warnings or errors from those channels):
+//        Logger.overrideLevel = .suppressAll
 //
-//        // print the time and file location when printing each message
-//        Logger.options = [.time, .file]
+//        // print the time, file location, and current thread for each logged message
+//        Logger.options = [.time, .file, .thread]
 //
-//  If you want to suppress all override prints (ie. warnings / errors from other channels), set the override level to .suppressAll:
-//    Logger.overrideLevel = .suppressAll
+//  If you want to completely suppress all messages from all channels, you can set the current level to .suppressAll:
+//    Logger.level = .suppressAll
 //
-//  ...or, to suppress all prints altogether, set the current level to .suppressAll:
-//    Logger.currentLevel = .suppressAll
+//  You can create your own delegate class if you want to do additional processing or tracking of Logger messages. Simply
+//  create a class which implements the LoggerDelegate protocol:
+//    class MyLogger: LoggerDelegate {
+//        func log(_ messageChannel: Logger.Channels, _ messageLevel: Logger.Level, _ message: String, _ file: StaticString, _ line: UInt, _ function: String) {
+//            if messageLevel == .error {
+//                MyErrorDatabase.addRow(file: file, line: line, message: message)
+//            }
+//        }
+//    }
+//  ...and then register an instance of that class with Logger:
+//    let myLogger = MyLogger()
+//    Logger.delegates.append(myLogger)
 //
-//  Addtional channels can be added in the Channels option set below as needed.
+//  Your delegate object will receive all messages logged to all channels at all levels; the .channels and .level
+//  filters are not applied to delegates.
+//
+//  Addtional channels can be added as needed in the Channels option set below.
 //
 //  LICENSE:
 //  MIT License
@@ -110,8 +142,9 @@ custom_rules:
     severity: warning
 */
 
-// If you do enable the above rules, the next line is needed to prevent them from triggering in this file.
+// (These comment lines are then needed to prevent SwiftLint from triggering in this file:)
 // swiftlint:disable logger_enforce
+// swiftlint:disable function_parameter_count
 
 import Foundation
 
@@ -166,7 +199,14 @@ class Logger {
     static var overrideLevel: Level = .warning
     static var options: Options = .initial
 
+    // delegates
+    static var delegates: [LoggerDelegate] = []
+
     static func log(_ messageChannel: Channels, _ messageLevel: Level, _ message: String = "", _ file: StaticString = #file, _ line: UInt = #line, _ function: String = #function) {
+        for delegate in delegates {
+            delegate.log(messageChannel, messageLevel, message, file, line, function)
+        }
+        
         guard level.rawValue < Level.suppressAll.rawValue else {
             return
         }
@@ -265,4 +305,8 @@ class Logger {
         }
         return appString
     }
+}
+
+protocol LoggerDelegate: class {
+    func log(_ messageChannel: Logger.Channels, _ messageLevel: Logger.Level, _ message: String, _ file: StaticString, _ line: UInt, _ function: String)
 }
