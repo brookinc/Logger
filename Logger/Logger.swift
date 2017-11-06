@@ -242,6 +242,20 @@ class Logger {
             if options.contains(.level) {
                 print(messageLevel, terminator: " ")
             }
+            if options.contains(.thread) || options.contains(.threadVerbose) {
+                // print the current thread info -- it's not exposed directly, but we can parse it from the description
+                // (technically, `Thread.name` is available, but in practice it appears to always be empty.)
+                let str = Thread.current.description  // Sample description: "<NSThread: 0x1c007ebc0>{number = 1, name = main}"
+                let threadNumber = str.substring(with: str.range(of: "number = ")?.upperBound ..< str.range(of: ",")?.lowerBound)
+                var threadString = "[t\(threadNumber)]"
+                if options.contains(.threadVerbose) {
+                    let threadAddress = str.substring(with: str.range(of: "0")?.lowerBound ..< str.range(of: ">")?.lowerBound)
+                    let threadName = str.substring(with: str.range(of: "name = ")?.upperBound ..< str.range(of: "}")?.lowerBound)
+                    let threadNameString = (threadName == "(null)") ? "" : " (\(threadName))"
+                    threadString = "[\(threadNumber):\(threadAddress)\(threadNameString)]"
+                }
+                print(threadString, terminator: " ")
+            }
             if options.contains(.file) || options.contains(.fileVerbose) || message.isEmpty {
                 var fileString = file.description
                 if !options.contains(.fileVerbose) {
@@ -264,20 +278,6 @@ class Logger {
                     }
                 }
                 print("\(functionString)", terminator: " ")
-            }
-            if options.contains(.thread) || options.contains(.threadVerbose) {
-                // print the current thread info -- it's not exposed directly, but we can parse it from the description
-                // (technically, `Thread.name` is available, but in practice it appears to always be empty.)
-                let str = Thread.current.description  // Sample description: "<NSThread: 0x1c007ebc0>{number = 1, name = main}"
-                let threadNumber = str.substring(with: str.range(of: "number = ")?.upperBound ..< str.range(of: ",")?.lowerBound)
-                var threadString = "[\(threadNumber)]"
-                if options.contains(.threadVerbose) {
-                    let threadAddress = str.substring(with: str.range(of: "0")?.lowerBound ..< str.range(of: ">")?.lowerBound)
-                    let threadName = str.substring(with: str.range(of: "name = ")?.upperBound ..< str.range(of: "}")?.lowerBound)
-                    let threadNameString = (threadName == "(null)") ? "" : " (\(threadName))"
-                    threadString = "[\(threadNumber):\(threadAddress)\(threadNameString)]"
-                }
-                print(threadString, terminator: " ")
             }
             print(message)
 
