@@ -30,7 +30,6 @@ Logger also lets you print additional information along with each message:
 - `.file` / `.fileVerbose`: the file name and line number from which the message was logged
 - `.function` / `.functionVerbose`: the function from which the message was logged
 - `.thread` / `.threadVerbose`: the thread from which the message was logged
-- `.assertOnError`: this option will trigger an assert failure whenever an error is logged
 
 You can customize which information is printed at any time by updating `Logger.options`:
 
@@ -42,7 +41,8 @@ If you want to do any custom handling of Logger messages, you can create a deleg
 class MyLogger: LoggerDelegate {
     func log(_ messageChannel: Logger.Channels, _ messageLevel: Logger.Level, _ message: String, _ file: StaticString, _ line: UInt, _ function: String) {
         if messageLevel == .error {
-            MyErrorDatabase.addRow(file: file, line: line, message: message)
+            // we will assert whenever any error message is logged:
+            assertionFailure(message, file: file, line: line)
         }
     }
 }

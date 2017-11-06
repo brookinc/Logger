@@ -24,9 +24,6 @@
 //    .function/.functionVerbose:  prints the name of the function from which the message was logged
 //    .thread/.threadVerbose:      prints the thread from which the message was logged
 //
-//  You can also enable the .assertOnError option, which will trigger an assert any time an (unsuppressed)
-//  error message is logged.
-//
 //  By default, all channels are printed (using the .initial option set), for all messages flagged .standard or higher.
 //  In addition, even if you limit the channels being printed (see below), messages flagged .warning or .error will
 //  (by default) still be printed for all channels.
@@ -58,12 +55,13 @@
 //  If you want to completely suppress all messages from all channels, you can set the current level to .suppressAll:
 //    Logger.level = .suppressAll
 //
-//  You can create your own delegate class if you want to do additional processing or tracking of Logger messages. Simply
-//  create a class which implements the LoggerDelegate protocol:
+//  You can create your own delegate if you want to do additional processing or tracking of Logger messages. Simply create
+//  a class which implements the LoggerDelegate protocol:
 //    class MyLogger: LoggerDelegate {
 //        func log(_ messageChannel: Logger.Channels, _ messageLevel: Logger.Level, _ message: String, _ file: StaticString, _ line: UInt, _ function: String) {
 //            if messageLevel == .error {
-//                MyErrorDatabase.addRow(file: file, line: line, message: message)
+//                // we will assert whenever any error message is logged:
+//                assertionFailure(message, file: file, line: line)
 //            }
 //        }
 //    }
@@ -184,7 +182,6 @@ class Logger {
         static let functionVerbose =  Options(rawValue: 1 << 7)
         static let thread =           Options(rawValue: 1 << 8)
         static let threadVerbose =    Options(rawValue: 1 << 9)
-        static let assertOnError =    Options(rawValue: 1 << 10)
 
         static let all =              Options(rawValue: UInt.max)
         static let initial: Options = [
@@ -282,10 +279,6 @@ class Logger {
                 print("\(functionString)", terminator: " ")
             }
             print(message)
-
-            if options.contains(.assertOnError) && messageLevel == .error {
-                assertionFailure(message, file: file, line: line)
-            }
         }
     }
 
