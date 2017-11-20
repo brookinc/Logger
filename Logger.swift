@@ -71,8 +71,7 @@
 //        }
 //    }
 //  ...and then register an instance of that class with Logger:
-//    let myLogger = MyLogger()
-//    Logger.delegates.append(myLogger)
+//    Logger.delegates.append(MyLogger())
 //
 //  Your delegate object will receive all messages logged to all channels at all levels; the .channels and .level
 //  filters are not applied to delegates.
@@ -204,7 +203,7 @@ class Logger {
         for delegate in delegates {
             delegate.log(messageChannel, messageLevel, message, file, line, function)
         }
-        
+
         guard level.rawValue < Level.suppressAll.rawValue else {
             return
         }
@@ -325,7 +324,7 @@ class Logger {
             print($0)
         }
     }
-    
+
     // experimental / undocumented way to read the executable's filename and path
     // (see https://lists.swift.org/pipermail/swift-users/Week-of-Mon-20161128/004143.html)
     static func appName(_ dsoHandle: UnsafeRawPointer = #dsohandle) -> String {

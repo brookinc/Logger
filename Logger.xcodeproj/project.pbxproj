@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BC94AB581FB01EFC006D5880 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC94AB571FB01EFC006D5880 /* main.swift */; };
-		BC94AB5F1FB0C0E4006D5880 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC94AB5E1FB0C0E4006D5880 /* Logger.swift */; };
+		BCB7EB371FC35E4B005BA779 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB7EB361FC35E4B005BA779 /* Logger.swift */; };
+		BCB7EB391FC35E5A005BA779 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB7EB381FC35E5A005BA779 /* main.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,8 +25,8 @@
 
 /* Begin PBXFileReference section */
 		BC94AB541FB01EFC006D5880 /* Logger */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Logger; sourceTree = BUILT_PRODUCTS_DIR; };
-		BC94AB571FB01EFC006D5880 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		BC94AB5E1FB0C0E4006D5880 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		BCB7EB361FC35E4B005BA779 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		BCB7EB381FC35E5A005BA779 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,7 +43,8 @@
 		BC94AB4B1FB01EFC006D5880 = {
 			isa = PBXGroup;
 			children = (
-				BC94AB561FB01EFC006D5880 /* Logger */,
+				BCB7EB381FC35E5A005BA779 /* main.swift */,
+				BCB7EB361FC35E4B005BA779 /* Logger.swift */,
 				BC94AB551FB01EFC006D5880 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,15 +55,6 @@
 				BC94AB541FB01EFC006D5880 /* Logger */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		BC94AB561FB01EFC006D5880 /* Logger */ = {
-			isa = PBXGroup;
-			children = (
-				BC94AB5E1FB0C0E4006D5880 /* Logger.swift */,
-				BC94AB571FB01EFC006D5880 /* main.swift */,
-			);
-			path = Logger;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -123,8 +115,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC94AB581FB01EFC006D5880 /* main.swift in Sources */,
-				BC94AB5F1FB0C0E4006D5880 /* Logger.swift in Sources */,
+				BCB7EB371FC35E4B005BA779 /* Logger.swift in Sources */,
+				BCB7EB391FC35E5A005BA779 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

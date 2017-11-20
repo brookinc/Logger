@@ -22,7 +22,7 @@ Logger.log(.fileIO, "File system is accessible.")               // wont' print (
 
 // log a warning and an error
 Logger.log(.ui, .error, "Couldn't display the image.")          // will print (channel still enabled)
-Logger.log(.network, .warning, "Couldn't retrieve the image.")  // will print (warnings and errors from any channel are printed by default)
+Logger.log(.network, .warning, "Couldn't retrieve the image.")  // will print (by default, warnings and errors from any channel are printed, even channels that aren't enabled)
 
 // change our override setting to no longer show errors or warnings from disabled channels
 Logger.overrideLevel = .suppressAll

@@ -5,7 +5,7 @@ A lightweight, flexible, channel-based logging tool for Swift.
 Logger offers an easy way to organize your `print()` statements into separate channels, and to control which channels are enabled and disabled:
 
 ```swift
-Logger.log(.network, "Packet 1 received")  // will print (all channels are enabled by default)
+Logger.log(.network, "Packet 1 received")  // will print (by default, all channels are enabled)
 Logger.channels = [.ui, .rendering]
 Logger.log(.network, "Packet 2 received")  // won't print
 ```
@@ -53,11 +53,10 @@ class MyLogger: LoggerDelegate {
 ...and register it:
 
 ```swift
-let myLogger = MyLogger()
-Logger.delegates.append(myLogger)
+Logger.delegates.append(MyLogger())
 ```
 
-Your delegate object will receive all messages that get logged; the .channel and .level filters are not applied to delegates.
+Your delegate object will receive all messages; the .channel and .level filters are not applied to delegates.
 
 ## How to use it
 Just copy `Logger.swift` into your project and start logging. :)
